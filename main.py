@@ -37,7 +37,7 @@ print(
       f"Gönderi Bilgi: {message}\n"
       f"Gönderi Durumu: {desc}")
 
-logging.info(f"[{datetime.datetime(2020, 5, 17)}]Teslimat No: {teslimatNumarasi}, Takip No: {takipNumarasi}, Message: {message}, Status: {desc}")
+logging.info(f"[{datetime.datetime.now():%Y, %m, %d %H:%M}] Teslimat No: {teslimatNumarasi}, Takip No: {takipNumarasi}, Message: {message}, Status: {desc}")
 
 
 
