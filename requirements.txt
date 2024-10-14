@@ -1,0 +1,6 @@
+requests==2.31.0
+datetime==5.1
+logging==0.6.0
+json==2.0.9
+os==0.1.0
+sys==0.0.0
