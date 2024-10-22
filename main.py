@@ -15,31 +15,33 @@ def trendyol_express():
       headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0","Accept-Language": "tr-TR,tr;q=0.8,en-US;q=0.5,en;q=0.3", "Cache-Control": "no-cache"}
       cookies = {'cookie_name': 'cookie_value',}
 
-      takipNumarasiResponse = requests.get(f"https://texpublic-mars.trendyol.com/delivery-lastmileplanning-cargo-tracking-service/api/tracks?trackingNumber={teslimatNumarasi}", headers=headers, cookies=cookies)
+      takipNumarasiResponse = requests.get(f"https://texpublic-mars.trendyol.com/delivery-lastmileplanning-cargo-tracking-service/api/track?trackingNumber={teslimatNumarasi}", headers=headers, cookies=cookies)
       if takipNumarasiResponse.status_code != 200: 
             os.system("cls")  
             print(f"Hatali Takip Numarasi.\nStatus Code: {takipNumarasiResponse.status_code}")
       else:      
-            takipNumarasi = json.loads(takipNumarasiResponse.content.decode('utf-8'))[0]
-            teslimatResponse = requests.get(f"https://texpublic-mars.trendyol.com/delivery-lastmileplanning-communication-service/api/chatbot/rule-result?deliveryNumber={takipNumarasi}&categoryId=chatbot.findDeliveryLocation")
-            if teslimatResponse.status_code !=200:
-                  os.system("cls")
-                  print(f"Hata.\nStatus Code: {teslimatResponse.status_code}")
-            else:
-                  veri = teslimatResponse.json()
+            veri = takipNumarasiResponse.json()
+            SiparisNo = veri['orderNumber']
+            TeslimatNo = veri['deliveryNumber']
+            HedefSube = veri['targetXDock']
+            KargoDurumu = veri['progress']['desc']
+            AliciAdSoyad = veri['receiver']['name']
+            GonderenAdSoyad = veri['sender']['name']
+            AliciBilgi = veri['history']
+            urun_takibi = '\n'.join([f"{i+1}. {item['description']}" for i, item in enumerate(AliciBilgi)])
 
-      message = veri['message']
-      desc = veri['progress']['desc']
-      ordernumber = veri['orderNumber']
+            os.system("cls")
+            print(""
+                  f"Sipariş Numarası: {SiparisNo}\n"
+                  f"Teslimat Numarası: {TeslimatNo}\n"
+                  f"Teslimat Şubesi: {HedefSube}\n"
+                  f"Kargo Durumu: {KargoDurumu}\n\n"
+                  f"Alici Ad Soyad: {AliciAdSoyad}\n"
+                  f"Gönderici Ad Soyad: {GonderenAdSoyad}\n"
+                  f"\n\nÜrün Durumu;\n{urun_takibi}")
 
-      os.system("cls")
-      print(
-            f"Takip Numarası: {takipNumarasi}\n"
-            f"Teslimat Numarası: {ordernumber}\n"
-            f"Gönderi Bilgi: {message}\n"
-            f"Gönderi Durumu: {desc}\n")
-
-      logging.info(f"[{datetime.datetime.now():%Y, %m, %d %H:%M}] Teslimat No: {teslimatNumarasi}, Takip No: {takipNumarasi}, Message: {message}, Status: {desc}")
+      
+      logging.info(f"[{datetime.datetime.now():%Y, %m, %d %H:%M}] Teslimat No: {TeslimatNo}, Sipariş No: {SiparisNo}, Message: {KargoDurumu} , Status: {takipNumarasiResponse}")
 
 def aras_kargo(): 
       os.system("cls")
@@ -60,7 +62,7 @@ def aras_kargo():
          "TrackingNumber": f"{takipNo}",
          "IsWeb": True,
          "UniqueCode": "29786c54-3a38-4ddf-8c08-46eb2b1489f2",
-         "SecretKey": "8at5zc", #Geçerlilik Süresi 1 Gün, 1 kere sitedeki captchayı çözüp body kısmını buraya atmalısınız.
+         "SecretKey": "8at5zc",
          "LanguageCode": "tr"
          }
       TrackingInfoData = {
@@ -115,7 +117,6 @@ def secenekler():
       print("[1] Trendyol Express")
       print("[2] Aras Kargo")
 
-
 if __name__ == "__main__":
     while True:  
         secenekler()
@@ -128,11 +129,12 @@ if __name__ == "__main__":
                 if secim == 1:
                     os.system("cls") 
                     trendyol_express()
-                    time.sleep(15)
+                    input("\n\n\nGeri dönmek için enter tuşuna basın.")
                     os.system('cls')  
                 elif secim == 2:
+                    os.system("cls") 
                     aras_kargo()
-                    time.sleep(15)
+                    input("\n\n\nGeri dönmek için enter tuşuna basın.")
                     os.system('cls') 
                 elif secim == 3:
                     sys.exit(0)
